@@ -11,7 +11,7 @@ import copy
 # ______________________________________________________________________________
 
 
-#TAI Content
+#TAI Content:
 def c_peg ():
 	return "O"
 def c_empty():
@@ -48,30 +48,22 @@ def move_final (move):
 
 # ______________________________________________________________________________
 
-# Board Operations
-
-def num_columns(board):
-	return len(board[0])
-
-def num_lines(board):
-	return len(board)
-
 
 def is_move(board, l, c, dl, dc):
 	return is_peg(board[l+dl][c+dc]) and is_empty(board[l+(2*dl)][c+(2*dc)])
 
 
-def board_moves (board):	
-	board_lines = num_lines(board)
-	board_columns = num_columns(board)
+def board_moves (board):
+	board_lines = len(board)
+	board_columns = len(board[0])
 
 	poss = []
-    
+
 	for l in range(board_lines):
 		for c in range(board_columns):
 
-			if is_peg(board[l][c]): 
-			#find pegs because the number of pegs decrease with the game
+			if is_peg(board[l][c]):
+			#procura pecas pq a medida do jogo o num de pecas diminui
 
 				if c <= board_lines-3 and is_move(board, l, c, 0, 1):
 					poss.append(make_move(make_pos(l,c),make_pos(l,c+2)))
@@ -80,10 +72,11 @@ def board_moves (board):
 					poss.append(make_move(make_pos(l,c),make_pos(l,c-2)))
 
 				if l <= board_lines-3 and is_move(board, l, c, 1, 0):
-					poss.append(make_move(make_pos(l,c),make_pos(l+2,c))) 
+					poss.append(make_move(make_pos(l,c),make_pos(l+2,c)))
 
 				if l >= 2 and is_move(board, l, c, -1, 0):
 					poss.append(make_move(make_pos(l,c),make_pos(l-2,c)))
+
 	return poss
 
 
@@ -105,26 +98,27 @@ def board_perform_move(board, move):
 	return new_board
 
 
-
 def count_pegs(board):
-	board_lines = num_lines(board)
-	board_columns = num_columns(board)
+	board_lines = len(board)
+	board_columns = len(board[0])
+
 	counter = 0
 
 	for l in range(board_lines):
 		for c in range(board_columns):
-			if is_peg(board[l][c]): 
+			if is_peg(board[l][c]):
 				counter += 1
+
 	return counter
 
 
 # ______________________________________________________________________________
 
+
 class sol_state:
 
 	def __init__(self, board):
 		self.board = board
-		self.n_pegs = counter(board)
 
 
 	def __lt__(self, other_sol_state):
@@ -132,33 +126,30 @@ class sol_state:
 
 
 
+	"""def board_performe_move():
+		#copia profunda do board e altera"""
+
+
 # ______________________________________________________________________________
 
 class solitaire(Problem):
 
 	def __init__(self, board):
-		initial = sol_state(board)
+		self.initial = sol_state(board)
 
-	
+
 	def actions(self, state):
 		return board_moves(state.board)
-	
-	
-	def result(self, state, action):
-		#se n for emtpy action -1 n_pegs
-		return sol_state(board_perform_move(state.board, action))
-	
-	
-	def goal_test(self, state):
-		return state.n_pegs == 1
-	
-	
-	def path_cost(self, c, state1, action, state2):
-		"""Return the cost of a solution path that arrives at state2 from
-		state1 via action."""
-		#num de movimentos
-		return 1
 
+	def result(self, state, action):
+		return sol_state(board_perform_move(state.board, action))
+
+	def goal_test(self, state):
+		#print(count_pegs(state.board))
+		return count_pegs(state.board) == 1
+
+	def path_cost(self, c, state1, action, state2):
+		return c+1;
 
 	def h(self, node):
 		return 1
@@ -166,16 +157,12 @@ class solitaire(Problem):
 		#possiveis moves
 
 
-"""
 
+"""
 b1 = [["_","O","O","O","_"], ["O","_","O","_","O"], ["_","O","_","O","_"],
 ["O","_","O","_","_"], ["_","O","_","_","_"]]
 
-x = count_pegs(b1)
-print(x)
-
-
-lst = board_moves(b1)
+lst = count_pegs(b1)
 print(lst)
 ls1 = board_perform_move(b1, [(0, 2), (0, 0)])
 print(ls1)
