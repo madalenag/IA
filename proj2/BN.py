@@ -35,24 +35,33 @@ class Node():
 #______________________________________________________________
 
 
-def inferenceEnum(unknown, pos, val, evid, bn):
+def inferenceEnum(unknown, posterior, val, evid, bn):
     res = 0
-    evid[pos] = val
+    evid[posterior] = val
 
-    for i in (1, 0):
-        evid[unknown[0]] = i
+    return recursiveEnum(unknown, evid, bn, res)
 
-        for j in (1, 0):
-            evid[unknown[1]] = j
+
+
+def recursiveEnum(unknown, evid, bn,res):
+    res = 0
+    if len(unknown) == 1:
+        for i in (1,0):
+            evid[unknown[0]] = i
             res += bn.computeJointProb(evid)
-            
+    else:
+        for i in (1, 0):
+            evid[unknown[0]] = i
+            res += recursiveEnum(unknown[1:], evid, bn,res)
     return res
+
 
 
 def parseEvid(evid):
     unknown = []
+    lenght = len(evid)
 
-    for i in range(len(evid)):
+    for i in range(lenght):
         if evid[i] == []:
             unknown.append(i)
         elif evid[i] == -1:
@@ -74,14 +83,13 @@ class BN():
 
 
     def computePostProb(self, evid):
-        pos, unknown = parseEvid(evid)
+        post, unknown = parseEvid(evid)
 
-        pos_true = inferenceEnum(unknown, pos, 1, list(evid), self)
-        pos_false = inferenceEnum(unknown, pos, 0, list(evid), self)
+        postTrue = inferenceEnum(unknown, post, 1, list(evid), self)
+        postFalse = inferenceEnum(unknown, post, 0, list(evid), self)
 
-        alfa = 1/(pos_true + pos_false)
-
-        return alfa * pos_true  
+        alfa = 1/(postTrue + postFalse)
+        return alfa * postTrue  
    
 
     def computeJointProb(self, evid):
