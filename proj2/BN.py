@@ -1,20 +1,15 @@
 '''
-Taissa Ribeiro - 86514
 Madalena Galrinho - 87546
+Taissa Ribeiro - 86514
 Grupo 11
 '''
-
 import numpy as np
-np.set_printoptions(precision=4, suppress=True)
 
 
-def evidposB(evid):
-    return evid[0]
-def evidposE(evid):
-    return evid[1]
-def evidposA(evid):
-    return evid[2]
-
+#______________________________________________________________
+#
+# Class Node
+#______________________________________________________________
 
 class Node():
 
@@ -23,59 +18,77 @@ class Node():
         self.parents = parents
 
     
+
     def computeProb(self, evid):
-        p = 0;
+        l = []
+        
+        for i in self.parents:
+            l.append(evid[i])
+        
+        p = eval(('self.prob'+'[{}]'*len(l)).format(*l))
+        return [1-p, p]
 
-        if len(self.parents) == 0:
-            p = self.prob[0]
 
-        elif len(self.parents) == 1:
-            p = self.prob[evid[self.parents[0]]]
+#______________________________________________________________
+#
+# Auxiliar Functions
+#______________________________________________________________
 
-        elif len(self.parents) == 2:
-            p = self.prob[evid[self.parents[0]]][evid[self.parents[1]]]
 
-        return [1 - p, p];
-   
-    
+def inferenceEnum(unknown, pos, val, evid, bn):
+    res = 0
+    evid[pos] = val
 
+    for i in (1, 0):
+        evid[unknown[0]] = i
+
+        for j in (1, 0):
+            evid[unknown[1]] = j
+            res += bn.computeJointProb(evid)
+            
+    return res
+
+
+def parseEvid(evid):
+    unknown = []
+
+    for i in range(len(evid)):
+        if evid[i] == []:
+            unknown.append(i)
+        elif evid[i] == -1:
+            posterior = i
+
+    return posterior, unknown
+
+#______________________________________________________________
+#
+# Class BN
+#______________________________________________________________
 
 
 class BN():
     
     def __init__(self, gra, prob):
-        self.gra = gra
+        self.graph = gra
         self.prob = prob
 
 
     def computePostProb(self, evid):
-        pass
-               
-        return 0
-        
-        
-    '''
-    def computeJointProb(self, evid):
-        jp = 1;
-        lenght = len(self.prob)
-        
-        for i in range(lenght):
-            prob = self.prob[i].computeProb(evid)
+        pos, unknown = parseEvid(evid)
 
-            if i < 2 and evid[i] == 0:
-                jp = jp * prob[0]
-            else:
-                jp = jp * prob[1]
+        pos_true = inferenceEnum(unknown, pos, 1, list(evid), self)
+        pos_false = inferenceEnum(unknown, pos, 0, list(evid), self)
 
-        print(jp)
+        alfa = 1/(pos_true + pos_false)
 
-        return jp;
-    '''
+        return alfa * pos_true  
+   
 
     def computeJointProb(self, evid):
         jp = 1
+        lenght = len(evid)
         
-        for i in range(len(evid)):
+        for i in range(lenght):
             value = self.prob[i].computeProb(evid)
             jp *= value[evid[i]]
 
