@@ -3,8 +3,13 @@ Madalena Galrinho - 87546
 Taissa Ribeiro - 86514
 Grupo 11
 '''
-import numpy as np
 
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 16 20:31:54 2017
+
+@author: mlopes
+"""
 
 #______________________________________________________________
 #
@@ -38,6 +43,9 @@ class Node():
 def inferenceEnum(unknown, posterior, val, evid, bn):
     res = 0
     evid[posterior] = val
+
+    if not unknown:
+    	return bn.computeJointProb(evid)
 
     return recursiveEnum(unknown, evid, bn, res)
 

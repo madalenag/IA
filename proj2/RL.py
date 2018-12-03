@@ -1,9 +1,16 @@
+'''
+Madalena Galrinho - 87546
+Taissa Ribeiro - 86514
+Grupo 11
+'''
+
 # -*- coding: utf-8 -*-
 """
 Created on Mon Oct 16 20:31:54 2017
 
 @author: mlopes
 """
+
 import numpy as np
 import random
 
@@ -62,23 +69,42 @@ class finiteMDP:
 
             
     def traces2Q(self, trace):
-                # implementar esta funcao
-        
+        self.Q = np.zeros((self.nS,self.nA))
+        newQ = np.copy(self.Q)
+        i = 0
+        dif = 1
+        alpha = 0.1
+
+        while dif > 0.01:
+            for line in trace:
+                iS = int(line[0])
+                a = int(line[1])
+                nS = int(line[2])
+                r = int(line[3])
+
+                newQ[iS,a] = self.Q[iS,a] + alpha * (r + self.gamma * max(self.Q[nS,:]) - self.Q[iS,a])
+                
+                dif = np.linalg.norm(self.Q - newQ)
+                self.Q = np.copy(newQ)
 
         return self.Q
+    
     
     def policy(self, x, poltype = 'exploration', par = []):
         # implementar esta funcao
         
         if poltype == 'exploitation':
-            pass
+            a = self.Q[x].argmax()
+            print(self.Q[x,0])
+            print(self.Q[x,1])
+            print(a)
 
-            
         elif poltype == 'exploration':
-            pass
+            a = random.randint(0, len(self.Q[x])-1)
 
                 
         return a
+    
     
     def Q2pol(self, Q, eta=5):
         # implementar esta funcao
