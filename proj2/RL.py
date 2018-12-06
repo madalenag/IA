@@ -74,18 +74,6 @@ class finiteMDP:
         i = 0
         dif = 1
         alpha = 0.5
-        b = []
-        c = []
-        for sublist in trace:
-        	aux = []
-        	for subsublist in sublist:
-        		aux.append(subsublist)
-        	b.append(aux)
-        for sublist in b:
-        	if sublist not in c:
-        		c.append(sublist)
-        for t in c:
-            print(t)
 
         while dif > 0.1:
             for t in trace:
@@ -110,7 +98,6 @@ class finiteMDP:
 
         elif poltype == 'exploration':
             a = random.randint(0, self.nA-1)
-
 
         return a
 
