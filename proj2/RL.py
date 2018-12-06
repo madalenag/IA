@@ -74,18 +74,30 @@ class finiteMDP:
         i = 0
         dif = 1
         alpha = 0.5
+        b = []
+        c = []
+        for sublist in trace:
+        	aux = []
+        	for subsublist in sublist:
+        		aux.append(subsublist)
+        	b.append(aux)
+        for sublist in b:
+        	if sublist not in c:
+        		c.append(sublist)
+        for t in c:
+            print(t)
 
-        while dif > 0.00000000000001:
+        while dif > 0.1:
             for t in trace:
                 iS = int(t[0])
                 a = int(t[1])
                 nS = int(t[2])
                 r = int(t[3])
 
-                self.Q[iS,a] = self.Q[iS,a] + alpha * (r + self.gamma * max(self.Q[nS,:]) - self.Q[iS,a])
+                newQ[iS,a] = newQ[iS,a] + alpha * (r + self.gamma * max(newQ[nS,:]) - newQ[iS,a])
 
-                dif = np.linalg.norm(newQ - self.Q)
-                newQ = np.copy(self.Q)
+            dif = np.linalg.norm(newQ - self.Q)
+            self.Q = np.copy(newQ)
 
         return self.Q
 
@@ -95,9 +107,6 @@ class finiteMDP:
 
         if poltype == 'exploitation':
             a = par[x].argmax()
-            print(par[x,0])
-            print(par[x,1])
-            print(a)
 
         elif poltype == 'exploration':
             a = random.randint(0, self.nA-1)
